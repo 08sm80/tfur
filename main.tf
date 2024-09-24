@@ -1,17 +1,6 @@
 
 # Networks config
-
-data "google_compute_network" "default" { # existing default network
-  name = "default"
-}
-
-data "google_compute_network" "vpc1" { # existing custom network
-  name = "vpc1"
-}
-
-data "google_compute_subnetwork" "vpc1_sn2" {
-  name = "vpc1-sn2"
-}
+# moved to networks.tf
 
 # Compute
 
@@ -45,10 +34,18 @@ resource "google_compute_instance" "gce_vm1" {
   }
 
   metadata = {
-    ninja = "level-1"
+    ninja          = "level-1"
+    enable-oslogin = false
+    startup-script = <<-EOT
+#! /bin/bash
+sudo apt update
+sudo apt install busybox -y
+echo "Hello, World" > index.xhtml
+nohup busybox httpd -f -p 8080 &
+EOT
   }
 
-  metadata_startup_script = "echo hi > /test.txt"
+
 
   service_account {
     # Google recommends custom service accounts that have cloud-platform scope and permissions granted via IAM Roles.
@@ -63,7 +60,7 @@ resource "google_compute_firewall" "basic_access" {
   name    = "basic-access"
   allow {
     protocol = "TCP"
-    ports    = ["80", "443", "22"]
+    ports    = ["80", "443", "22", "8080"]
   }
   source_ranges = ["0.0.0.0/0"]
 }
