@@ -37,12 +37,12 @@ resource "google_compute_instance" "gce_vm1" {
     ninja          = "level-1"
     enable-oslogin = false
     startup-script = <<-EOT
-#! /bin/bash
-sudo apt update
-sudo apt install busybox -y
-echo "Hello, World" > index.xhtml
-nohup busybox httpd -f -p 8080 &
-EOT
+                   #!/bin/bash
+                   sudo apt update && sudo apt upgrade -y
+                   sudo apt install busybox -y
+                   echo "Hello, World" > index.xhtml
+                   nohup busybox httpd -f -p 8000 &
+                   EOT
   }
 
 
@@ -60,7 +60,7 @@ resource "google_compute_firewall" "basic_access" {
   name    = "basic-access"
   allow {
     protocol = "TCP"
-    ports    = ["80", "443", "22", "8080"]
+    ports    = ["80", "443", "22", "8000"]
   }
   source_ranges = ["0.0.0.0/0"]
 }
